@@ -48,7 +48,7 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/sonarr:/config
-      - ${DATA_ROOT}:/data
+      - ${DATA_ROOT}:/media_server
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping" ]
@@ -78,7 +78,7 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/radarr:/config
-      - ${DATA_ROOT}:/data
+      - ${DATA_ROOT}:/media_server
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping" ]
@@ -94,7 +94,7 @@ services:
       - homepage.name=Radarr
       - homepage.icon=radarr.png
       - homepage.href=/radarr
-      - homepage.description=Movies management
+      - homepage.description=Film management
       - homepage.weight=1
       - homepage.widget.type=radarr
       - homepage.widget.url=http://radarr:7878/radarr
@@ -108,7 +108,7 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/lidarr:/config
-      - ${DATA_ROOT}:/data
+      - ${DATA_ROOT}:/media_server
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8686/lidarr/ping" ]
@@ -140,7 +140,7 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/bazarr/config:/config
-      - ${DATA_ROOT}:/data
+      - ${DATA_ROOT}:/media_server
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:6767/bazarr/ping" ]
@@ -286,7 +286,7 @@ services:
       - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
     volumes:
       - ${CONFIG_ROOT:-.}/qbittorrent:/config
-      - ${DOWNLOAD_ROOT}:/data/torrents
+      - ${DOWNLOAD_ROOT}:/media_server/downloads
     restart: always
     healthcheck:
       # Container may fail if the PIA's token expired, so mark as unhealthy when there is no internet connection
@@ -352,7 +352,7 @@ services:
     image: golift/unpackerr
     container_name: unpackerr
     volumes:
-      - ${DOWNLOAD_ROOT}:/data/torrents
+      - ${DOWNLOAD_ROOT}:/media_server/downloads
     restart: always
     user: ${USER_ID}:${GROUP_ID}
     environment:
@@ -372,7 +372,7 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/sabnzbd:/config
-      - ${DATA_ROOT}:/data
+      - ${DOWNLOAD_ROOT}:/media_server/downloads
     restart: always
     labels:
       - traefik.enable=true
@@ -401,7 +401,7 @@ services:
       - JELLYFIN_PublishedServerUrl=${HOSTNAME}/jellyfin
     volumes:
       - ${CONFIG_ROOT:-.}/jellyfin:/config
-      - ${DATA_ROOT}:/data
+      - ${DATA_ROOT}:/media_server
     ports:
       - "7359:7359/udp"
       - "1900:1900/udp"
@@ -440,7 +440,7 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${DATA_ROOT}:/data
+      - ${DATA_ROOT}:/media_server
     restart: always
     command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     labels:
