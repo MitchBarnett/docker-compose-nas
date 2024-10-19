@@ -323,24 +323,17 @@ services:
       - homepage.widget.username=${QBITTORRENT_USERNAME}
       - homepage.widget.password=${QBITTORRENT_PASSWORD}
   vpn:
-    image: thrnz/docker-wireguard-pia
+    image: qmcgaw/gluetun
     container_name: vpn
     volumes:
-      - ${CONFIG_ROOT:-.}/pia:/pia
-      - ${CONFIG_ROOT:-.}/pia-shared:/pia-shared
+      - ${CONFIG_ROOT:-.}/gluetun:/gluetun
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
     environment:
-      - LOC=${PIA_LOCATION}
-      - USER=${PIA_USER}
-      - PASS=${PIA_PASS}
-      - QBT_USER=${QBITTORRENT_USERNAME}
-      - QBT_PASS=${QBITTORRENT_PASSWORD}
-      - LOCAL_NETWORK=${PIA_LOCAL_NETWORK}
-      - PORT_FORWARDING=1
-      - PORT_PERSIST=1
-      - PORT_SCRIPT=/pia-shared/portupdate-qbittorrent.sh
+      - VPN_SERVICE_PROVIDER=nordvpn
+      - VPN_TYPE=wireguard # or wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
       - net.ipv6.conf.default.disable_ipv6=1
@@ -472,6 +465,30 @@ services:
       - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:latest
+    container_name: recyclarr
+    environment:
+      - TZ=${TIMEZONE}
+      - RECYCLARR_CREATE_CONFIG:true
+    volumes:
+      -  ${CONFIG_ROOT:-.}/recyclarr:/config
+    restart: always
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.recyclarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/recyclarr`))
+      - traefik.http.routers.recyclarr.tls=true
+      - traefik.http.routers.recyclarr.tls.certresolver=myresolver
+      - traefik.http.services.recyclarr.loadbalancer.server.port=7889
+      - homepage.group=Download
+      - homepage.name=recyclarr
+      - homepage.icon=recyclarr.png
+      - homepage.href=/recyclarr
+      - homepage.description=Subtitles management
+      - homepage.weight=4
+      - homepage.widget.type=recyclarr
+      - homepage.widget.url=http://recyclarr:7889/recyclarr
 
 networks:
   default:
