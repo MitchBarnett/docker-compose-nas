@@ -5,9 +5,18 @@
 - resources:
     cpu: true
     memory: true
+    cputemp: true
+    tempmin: 20
+    tempmax: 80
+
+- resources:
+    expanded: true
     disk:
       - /
-      - /data
+      - /media_server
+
+- resources:
+    uptime: true
 
 - search:
     provider: {{HOMEPAGE_VAR_SEARCH_PROVIDER}}
